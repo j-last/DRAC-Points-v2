@@ -1,40 +1,3 @@
-"""
-
-
-
-DRAC CLUB POINTS
-
-CLICK PLAY BUTTON (TOP RIGHT) TO START
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-"""
-
 import os
 import time
 import datetime
@@ -138,4 +101,3 @@ def backup():
 
 
 mainloop()
-
