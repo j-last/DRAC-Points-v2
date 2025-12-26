@@ -8,7 +8,10 @@ timeFormat = "%H.%M.%S"
 VALID_AGES = ["MU17", "M17-39", "M40-44", "M45-49", "M50-54", "M55-59", "M60-64", "M65+",
                  "WU17", "W17-34", "W35-39", "W40-44", "W45-49", "W50-54", "W55-59", "W60-64", "W65+"]
 
+# Getting names of runners
 def runnerExists(runnerName:str) -> bool:
+    """Returns True if the runner name exists, otherwise False.
+    """
     people = os.listdir("Members")
     if runnerName + ".txt" in people:
         return True
@@ -16,6 +19,9 @@ def runnerExists(runnerName:str) -> bool:
 
 
 def resolvePartName(partName:str):
+    """Attempts to match a partial name to a file.
+    Returns the name if it was successful, otherwise None.
+    """
     if len(partName.split()) < 2:
         return None # Name does not have a space in it
     name = ""
@@ -30,6 +36,8 @@ def resolvePartName(partName:str):
 
 
 def createFile():
+    """Prompts the user to create a new runner file.
+    """
     runnerName = capitaliseName(input("Create file for name: "))
 
     ageCat = ""
@@ -43,6 +51,11 @@ def createFile():
 
 
 def getAgeCat(runnerName):
+    """Gets the age category of a runner.
+    The runner must exist.
+    """
+    assert runnerExists(runnerName)
+
     f = open(os.path.join("Members", runnerName + ".txt"), "r")
     lines = f.readlines()
     ageCat = lines[1][:-1] # removes newline character
@@ -77,6 +90,11 @@ def getAgeCat(runnerName):
 
 
 def calcPoints(runnerName:str, raceTime:time, raceDist:str):
+    """Calculates the number of points to give a runner using the race distance and the time they got.
+    The runner must exist.
+    """
+    assert runnerExists(runnerName)
+
     standards = open("Code/Standards.json")
     data = json.load(standards)
     standards.close()
@@ -94,6 +112,11 @@ def calcPoints(runnerName:str, raceTime:time, raceDist:str):
 
 
 def getFileLines(runnerName:str):
+    """Gets the file lines of a runner's file in a list format.
+    The runner must exist.
+    """
+    assert runnerExists(runnerName)
+
     personFile = open(os.path.join("Members", runnerName + ".txt"), "r")
     fileLines = personFile.readlines()
     personFile.close()
@@ -101,12 +124,17 @@ def getFileLines(runnerName:str):
 
 
 def writeFileLines(name, lines_to_write):
+    """Writes a list of file lines to a runner's file.
+    The runner doesn't have to exist.
+    """
     personFile = open(os.path.join("Members", name + ".txt"), "w")
     personFile.writelines(lines_to_write)
     personFile.close()
 
 
 def addToFile(runnerName:str, pointsToAdd:int, *args) -> bool:
+    """Adds a race to a runner's file.
+    """
     fileLines = getFileLines(runnerName)
 
     newPoints = int(fileLines[2].strip()[8:]) + pointsToAdd
@@ -123,6 +151,8 @@ def addToFile(runnerName:str, pointsToAdd:int, *args) -> bool:
 
 
 def addToHistory(raceName, raceDist):
+    """Adds a race to the history.txt file
+    """
     f = open("history.txt", "r")
     filelines = f.readlines()
     f.close()

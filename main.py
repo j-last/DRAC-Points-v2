@@ -55,23 +55,25 @@ def manualRaceEntry():
     if raceDate is None: return
     points = raceDist
 
-    # Continually ask for runner names
     runnersAdded = 0
     while True:
         print("----------------------------------------------------------------------------------")
         print(f"{raceName.upper()} {raceDist} {raceDate} --- {runnersAdded} runners added so far.")
         print("----------------------------------------------------------------------------------")
+        
+        # Continually get runner names
         runnerName = getRunnerName()
         if runnerName is None: break
         points = None
-
         print(f"\nFILE: {runnerName.upper()}, {getAgeCat(runnerName)}\n")
 
+        # Calculate how many points they should get
         if not raceDist.isnumeric():
             runnerTime = getRaceTime()
             if runnerTime is None: print("Nothing added.\n"); continue
             points = calcPoints(runnerName, runnerTime, raceDist)
 
+        # Add it to their file
         addToFile(runnerName, points, raceDate, raceName, raceDist)
         runnersAdded += 1
         
