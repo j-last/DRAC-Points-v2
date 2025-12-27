@@ -37,8 +37,14 @@ def resolvePartName(partName:str):
 
 def createFile():
     """Prompts the user to create a new runner file.
+    File in the form Firstname Lastname.txt will be created.
     """
-    runnerName = capitaliseName(input("Create file for name: "))
+    runnerName = input("Create file for name: ").strip()
+    while len(runnerName.split()) != 2:
+        print("\nPlease write in the form <firstname> <lastname>.")
+        runnerName = input("Name: ").strip()
+    
+    runnerName = capitaliseName()
 
     ageCat = ""
     while ageCat not in VALID_AGES:

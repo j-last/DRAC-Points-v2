@@ -64,11 +64,12 @@ def manualRaceEntry():
         # Continually get runner names
         runnerName = getRunnerName()
         if runnerName is None: break
-        points = None
         print(f"\nFILE: {runnerName.upper()}, {getAgeCat(runnerName)}\n")
 
         # Calculate how many points they should get
-        if not raceDist.isnumeric():
+        if raceDist.isnumeric():
+            points = int(raceDist)
+        else:
             runnerTime = getRaceTime()
             if runnerTime is None: print("Nothing added.\n"); continue
             points = calcPoints(runnerName, runnerTime, raceDist)
