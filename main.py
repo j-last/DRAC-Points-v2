@@ -1,10 +1,4 @@
-import os
-import time
-import datetime
-import shutil
-from Code.file_functions import *
-from Code.input_functions import *
-from Code.scrape_functions import *
+from Code.raceClass import Race
 
 # constants
 timeFormat = "%H.%M.%S"
@@ -47,39 +41,29 @@ def urlRaceEntry():
 
 def manualRaceEntry():
     # Get race details
-    raceName = getRaceName()
-    if raceName is None: return
-    raceDist = getRaceDist()
-    if raceDist is None: return
-    raceDate = getRaceDate()
-    if raceDate is None: return
-    points = raceDist
+    try: race :Race = Race()
+    except ValueError: return
+
 
     runnersAdded = 0
     while True:
-        print("----------------------------------------------------------------------------------")
-        print(f"{raceName.upper()} {raceDist} {raceDate} --- {runnersAdded} runners added so far.")
-        print("----------------------------------------------------------------------------------")
-        
+        race.printRaceDetails()
+        print(f"{runnersAdded} RUNNERS ADDED (so far)")
+        input()
         # Continually get runner names
-        runnerName = getRunnerName()
-        if runnerName is None: break
-        print(f"\nFILE: {runnerName.upper()}, {getAgeCat(runnerName)}\n")
+        #runnerName = getRunnerName()
+        #if runnerName is None: break
+        #print(f"\nFILE: {runnerName.upper()}, {getAgeCat(runnerName)}\n")
 
         # Calculate how many points they should get
-        if raceDist.isnumeric():
-            points = int(raceDist)
-        else:
-            runnerTime = getRaceTime()
-            if runnerTime is None: print("Nothing added.\n"); continue
-            points = calcPoints(runnerName, runnerTime, raceDist)
+       # points = race.calcPoints(ageCat, time)
 
         # Add it to their file
-        addToFile(runnerName, points, raceDate, raceName, raceDist)
+        #addToFile()
         runnersAdded += 1
         
     print(f"\n{runnersAdded} RUNNERS ADDED")
-    addToHistory(raceName, raceDist)
+    #addToHistory(raceName, raceDist)
     
     
 

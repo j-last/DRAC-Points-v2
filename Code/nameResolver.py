@@ -1,0 +1,3 @@
+
+class NameResolver:
+    pass
