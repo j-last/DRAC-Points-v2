@@ -1,7 +1,13 @@
-from Code.raceClass import Race
+import time
+from colorama import Fore
+from Code.FileHandler import FileHandler
+from Code.Runner import Runner
+from Code.WebScraper import WebScraper
+from Code.NameResolver import NameResolver
+from Code.Race import Race
 
 # constants
-timeFormat = "%H.%M.%S"
+TIME_FORMAT = "%H.%M.%S"
 
 # main code
 def mainloop():
@@ -22,49 +28,86 @@ E: Backup & Exit
         else: print("Not a valid option. Please try again.")
 
 
-def urlRaceEntry():
-    raceName = getRaceName()
-    raceDist = getRaceDist()
-    raceDate = getRaceDate()
-
-    # gets runners and times
-
-    # checks all runners exist and creates a list of (runners, times & points) to be added
-    # user confirms and these are all added
-
-    # anyone not added is looped through asking for an alternative name
-
-    # add to history
-    pass
-    
-
-
 def manualRaceEntry():
-    # Get race details
     try: race :Race = Race()
     except ValueError: return
 
-
     runnersAdded = 0
     while True:
-        race.printRaceDetails()
-        print(f"{runnersAdded} RUNNERS ADDED (so far)")
-        input()
-        # Continually get runner names
-        #runnerName = getRunnerName()
-        #if runnerName is None: break
-        #print(f"\nFILE: {runnerName.upper()}, {getAgeCat(runnerName)}\n")
+        race.printDetails(runnersAdded)
 
-        # Calculate how many points they should get
-       # points = race.calcPoints(ageCat, time)
+        runner = NameResolver.getRunnerFromUser()
+        if runner is None: break
+        runner.printDetails()
+        runner.addToFile(race, race.getTime())
 
-        # Add it to their file
-        #addToFile()
         runnersAdded += 1
         
     print(f"\n{runnersAdded} RUNNERS ADDED")
-    #addToHistory(raceName, raceDist)
+    FileHandler.addToHistory(race)
+
+
+def urlRaceEntry():
+    try: race :Race = Race()
+    except ValueError: return
+    runnersAdded = 0
+    race.printDetails(runnersAdded)
+
+    try:
+        url = input("Copy and paste the totalRaceTiming URL: ")
+        if url == "": return
+        runnersAndTimes = WebScraper.getTotalRaceTimingResults(url)
+    except:
+        print(Fore.RED + "Something went wrong." + Fore.RESET + "\n")
+        return
+
+    toAdd, notAdded = [], []
+    for runnerName, raceTime in runnersAndTimes.items():
+        if Runner.exists(runnerName):
+            toAdd.append((Runner(runnerName), raceTime))
+        else:
+            # MOVE THIS CODE INTO NAME RESOLVE METHOD
+            print(Fore.RED)
+            response = input(f"{runnerName} could not be found. Type 'c' to create a file or leave blank to get the option to type their name in: ")
+            if response == "c":
+                runner = FileHandler.createFile()
+                if runner is None:
+                    print(Fore.RED + f"No result will be added for {runnerName}." + Fore.RESET + "\n")
+                    notAdded.append((runnerName, raceTime))
+                else:
+                    toAdd.append((Runner(runnerName), raceTime))
+            else:
+                runner = NameResolver.getRunnerFromUser()
+                if runner is None:
+                    print(Fore.RED + f"No result will be added for {runnerName}.")
+                    print(Fore.RESET)
+                    notAdded.append((runnerName, raceTime))
+                else:
+                    toAdd.append((runner, raceTime))
+            # ------------------------------------------
     
+    print(Fore.BLUE)
+    for runner, raceTime in toAdd:
+        print(f"{runner.name} - {time.strftime(TIME_FORMAT, raceTime)}")
+    print(Fore.RESET)
+    answer = input("ADD THESE RESULTS? (y/n) ")
+    if answer.lower() == "y":
+        print(Fore.BLUE)
+        for runner, raceTime in toAdd:
+            runner.addToFile(race, raceTime)
+            runnersAdded += 1
+        print(Fore.RESET)
+    
+    print(f"{runnersAdded} RUNNERS ADDED")
+
+    if len(notAdded) > 0:
+        print(Fore.RED)
+        print("NOT ADDED: ")
+        for runnerName, raceTime in notAdded:
+            print(f"{runnerName}, {time.strftime(TIME_FORMAT, raceTime)}")
+        print(Fore.RESET)
+
+    FileHandler.addToHistory(race)
     
 
 def addParkrunsAuto():

@@ -1,23 +1,7 @@
 import requests
 from bs4 import BeautifulSoup as bs
 
-def get_runners_and_times(url):
-    race_runners = {}
 
-    page = requests.get(url)
-    soup = bs(page.content, "html.parser")
-    runners = soup.find("tbody") # gets all 
-
-    for runner in runners:
-        runnerstring = runner.decode_contents()
-        if "<td>Dereham Runners AC</td>" in runnerstring:
-            runnerstring = runnerstring.split("<td")
-            name = runnerstring[2][1:-5] + " " + runnerstring[3][1:-5]
-            raceTime = runnerstring[-2][2:-8]
-
-            race_runners[name] = raceTime
-    
-    return race_runners
 
 
 def get_parkrunners(web_text):

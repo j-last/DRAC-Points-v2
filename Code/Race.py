@@ -1,4 +1,12 @@
 
+import json
+import time
+from colorama import Fore
+
+TIME_FORMAT = "%H.%M.%S"
+VALID_AGES = ["MU17", "M17-39", "M40-44", "M45-49", "M50-54", "M55-59", "M60-64", "M65+",
+                 "WU17", "W17-34", "W35-39", "W40-44", "W45-49", "W50-54", "W55-59", "W60-64", "W65+"]
+
 class Race:
 
     def __init__(self):
@@ -42,15 +50,40 @@ class Race:
         if date != "": return date
         else: return None
 
+    def getFullName(self):
+        if self.dist.isnumeric():
+            return self.name
+        return self.name + " " + self.dist
 
-    def printRaceDetails(self):
+
+    def printDetails(self, runnersAdded:int):
         """Prints the race details with horizontal lines above and below it.
         """
         if self.dist.isnumeric():
-            toPrint = f"{self.name}, {self.dist} POINTS, {self.date}"
+            toPrint = f"{self.name}, {self.dist} POINTS, {self.date} - {runnersAdded} runners added so far."
         else:
-            toPrint = f"{self.name} {self.dist}, {self.date}"
-        
+            toPrint = f"{self.name} {self.dist}, {self.date} - {runnersAdded} runners added so far."
+        print(Fore.GREEN)
         print("-" * len(toPrint))
         print(toPrint)
         print("-" * len(toPrint))
+        print(Fore.RESET)
+
+
+    def getTime(self):
+        if self.dist.isnumeric():
+            return
+        while True:
+            raceTime = input("Time: ")
+            if raceTime == "": return
+            elif raceTime.count(".") == 1:
+                raceTime = "0." + raceTime
+
+            try:
+                raceTime = time.strptime(raceTime, TIME_FORMAT)
+                return raceTime
+            except ValueError:
+                print(f"Invalid time format '{raceTime}'. Please try again.")
+
+
+ 
