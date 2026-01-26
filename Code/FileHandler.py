@@ -36,15 +36,16 @@ class FileHandler:
         File in the form FIRSTNAME LASTNAME.txt will be created.
         """
         while True:
-            name = input("Create file for name: ").strip()
+            name = input("Create file for name: ").strip().upper()
             if name == "":
                 print("\nNo new file created.")
+                return
+            if name + ".txt" in os.listdir("Members"):
+                print("A file already exists for that name. No new file created.")
                 return
             elif len(name.split()) == 2: 
                 break
             print("\nPlease write in the form <firstname> <lastname>.")
-        
-        name = name.upper()
 
         while True:
             ageCat = input(f"Age category for {name}: ").upper()
@@ -61,6 +62,33 @@ class FileHandler:
         return name
     
 
+    @staticmethod
+    def getParkrunDict():
+        parkrun_file = open("Parkruns/parkruns.txt", "r")
+        lines = parkrun_file.readlines()
+        parkrun_file.close()
+
+        newlines = {}
+        for line in lines:
+            name, total = line.split(" - ")
+            total = int(total)
+            newlines[name] = total
+        return newlines
+    
+
+    @staticmethod
+    def writeParkruns(parkrun_dict):
+        sorted_parkruns = []
+        for name, number in parkrun_dict.items():
+            sorted_parkruns.append((number, name))
+        sorted_parkruns.sort(reverse=True)
+
+        parkrun_file = open("Parkruns/parkruns.txt", "w")
+        for number, name in sorted_parkruns:
+            parkrun_file.write(f"{name} - {number}\n")
+        parkrun_file.close()
+    
+
     def addToHistory(race:Race):
         """Adds a race to the history.txt file
         """
@@ -69,7 +97,7 @@ class FileHandler:
         f.close()
 
         todaysDate = datetime.date.strftime(datetime.date.today(), "%d/%m/%y")
-        filelines.insert(0, f"{todaysDate}, {race.getFullName}\n")
+        filelines.insert(0, f"{todaysDate}, {race.getFullName()}\n")
 
         f = open("history.txt", "w")
         f.writelines(filelines)

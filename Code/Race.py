@@ -9,11 +9,13 @@ VALID_AGES = ["MU17", "M17-39", "M40-44", "M45-49", "M50-54", "M55-59", "M60-64"
 
 class Race:
 
-    def __init__(self):
-        self.name = self.inputRaceName()
+    def __init__(self, name=None, dist=None):
+        if name is not None: self.name = name
+        else: self.name = self.inputRaceName()
         if self.name is None: raise ValueError("No race name provided.")
 
-        self.dist = self.inputRaceDist()
+        if dist is not None: self.dist = dist
+        else: self.dist = self.inputRaceDist()
         if self.dist is None: raise ValueError("No race distance provided.")
 
         self.date = self.inputRaceDate()

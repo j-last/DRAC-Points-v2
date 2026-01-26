@@ -24,3 +24,29 @@ class WebScraper:
         
         return race_runners
     
+
+    def getParkrunners(web_text):
+        endindex = web_text.find("Dereham Runners AC")
+        runners = []
+
+        while endindex != -1:
+            index = endindex
+            spacesfound = 0
+            while spacesfound != 2:
+                index -= 1
+                if web_text[index] == "	":
+                    spacesfound += 1
+            name = web_text[index:endindex].strip()
+            name = name.split(" ")
+            if len(name) >= 2:
+                newname = name[0]
+                for i in range(1, len(name)):
+                    name[i] = name[i].upper()
+                    newname += " " + name[i]
+                name = newname
+                runners.append(name)
+            web_text = web_text[endindex + 1 :]
+            endindex = web_text.find("Dereham Runners AC")
+
+        return runners
+    
