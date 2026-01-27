@@ -96,7 +96,7 @@ def addParkrunsAuto():
     """
     try: race :Race = Race("parkrun", "1")
     except ValueError: return
-
+    Printer.red("If it starts asking you to create files, you can just ignore this (enter nothing) unless they are a junior.\n Alternatively, you can create a file for them to stop it asking again next time.")
     with open("Parkruns/don't add to parkrun list.txt") as f:
         dontAdd = f.readlines()
         dontAdd = list(map(str.upper, map(str.strip, dontAdd)))

@@ -77,7 +77,7 @@ class NameResolver:
         Returns a Runner object for the runner if it was successful.
         Returns None otherwise.
         """
-        Printer.red(f"'{name}' could not be resolved to a member\n    {Fore.RESET}'c' - create a file\n    'n' - type in their file name")
+        Printer.red(f"'{name}' could not be resolved to a member\n    {Fore.RESET}'c' - create a file\n    'n' - type in their file name\n    type nothing and press enter to do nothing")
         response = input().lower()
 
         if response == 'c':
