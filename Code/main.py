@@ -2,8 +2,8 @@ import datetime
 import os
 import shutil
 import time
-from colorama import Fore
 from Code.FileHandler import FileHandler
+from Code.Printer import Printer
 from Code.WebScraper import WebScraper
 from Code.NameResolver import NameResolver
 from Code.Race import Race
@@ -46,7 +46,7 @@ def urlRaceEntry():
         if url == "": return
         runnersAndTimes = WebScraper.getTotalRaceTimingResults(url)
     except:
-        print(Fore.RED + "Something went wrong." + Fore.RESET + "\n")
+        Printer.red("Something went wrong.")
         return
 
     # Resolve all names, creating a list of (name that exists, their time)
@@ -57,35 +57,29 @@ def urlRaceEntry():
         if runner is not None:
             toAdd.append((runner, raceTime))
         else:
-            print(Fore.RED + f"No result will be added for {runnerName}." + Fore.RESET + "\n")
+            Printer.red(f"No result will be added for {runnerName}.")
             notAdded.append((runnerName, raceTime))
     
     # Display all results that will be added before they're added
-    print(Fore.BLUE)
     for runner, raceTime in toAdd:
-        print(f"{runner.name} - {time.strftime(TIME_FORMAT, raceTime)}")
-    print(Fore.RESET)
+        Printer.blue(f"{runner.name} - {time.strftime(TIME_FORMAT, raceTime)}")
     answer = input("ADD THESE RESULTS? (y/n) ")
     if answer.lower() == "y":
         # add the results
-        print(Fore.BLUE)
         for runner, raceTime in toAdd:
             runner.addToFile(race, raceTime)
             runnersAdded += 1
-        print(Fore.RESET)
     else:
-        print(Fore.RED + "No results added" + Fore.RESET)
+        Printer.red("No results added")
         return
     
     print(f"{runnersAdded} RUNNERS ADDED")
 
     # Display all not added results before exiting to main menu
     if len(notAdded) > 0:
-        print(Fore.RED)
-        print("NOT ADDED: ")
+        Printer.red("NOT ADDED: ")
         for runnerName, raceTime in notAdded:
-            print(f"{runnerName} - {time.strftime(TIME_FORMAT, raceTime)}")
-        print(Fore.RESET)
+            Printer.red(f"{runnerName} - {time.strftime(TIME_FORMAT, raceTime)}")
 
     FileHandler.addToHistory(race)
     
@@ -106,7 +100,7 @@ def addParkrunsAuto():
     not_added = []
     for name in runners:
         if name in dontAdd: 
-            print(Fore.RED + f"{name} is being ignored" + Fore.RESET)
+            Printer.red(f"{name} is being ignored")
             continue
 
         if newlines.get(name) is not None:
@@ -156,7 +150,7 @@ def listOfNames():
     try: race :Race = Race()
     except ValueError: return
     if not race.dist.isnumeric():
-        print(Fore.RED + "A list of names can only be done for a race with a fixed amount of points." + Fore.RESET)
+        Printer.red("A list of names can only be done for a race with a fixed amount of points.")
         return
     
     stringList = input("Enter a list of names, separated by commas (,):\n").upper()
@@ -164,26 +158,22 @@ def listOfNames():
     try:
         nameList = stringList.split(",")
     except:
-        print(Fore.RED + "List is in an invalid format." + Fore.RESET)
+        Printer.red("List is in an invalid format.")
         return
     
     for i in range(len(nameList)):
-        nameList[i] = NameResolver.resolveName(nameList[i].strip())
+        nameList[i] = NameResolver.getRunnerFromName(nameList[i].strip())
     
     totalRunners = 0
-    print(Fore.BLUE)
     for runner in nameList:
         if runner is not None:
-            print(runner.name)
+            Printer.blue(runner.name)
             totalRunners += 1
-    print(Fore.RESET)
 
     runnersAdded = 0
     if input(f"Add {race.dist} to these people ({totalRunners} runners)? (y/n) ").lower() == "y":
-        print(Fore.BLUE)
         for runner in nameList:
             runner.addToFile(race, None)
-        print(Fore.RESET)
 
     print(f"{runnersAdded} runners added.")
 

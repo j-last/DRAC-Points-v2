@@ -2,8 +2,8 @@
 
 import os
 
-from colorama import Fore
 from Code.FileHandler import FileHandler
+from Code.Printer import Printer
 from Code.Runner import Runner
 
 
@@ -34,6 +34,7 @@ class NameResolver:
     def getRunnerFromName(name:str) -> Runner:
         if Runner.exists(name):
             return Runner(name)
+        
         runner = NameResolver.resolveName(name)
         if runner is not None:
             return runner
@@ -49,27 +50,24 @@ class NameResolver:
         Returns the name if it was successful, otherwise None.
         """
         if name.count(" ") != 1:
-            return NameResolver.couldntResolve(name)
+            return
         firstName, lastName = name.split()
-        for i in range(min(len(firstName), len(lastName)), 0, -1):
-            name = ""
-            for fileName in os.listdir("Members"):
-                fileFirstName, fileLastName = fileName[:-4].split()
-                if (fileFirstName[:i] == firstName[:i] and fileLastName[:i] == lastName[:i]):
-                    if name != "":
-                        return NameResolver.couldntResolve(f"{firstName} {lastName}")
-                    name = fileName[:-4]
-            if name != "":
-                print(Fore.YELLOW)
-                print(f"{firstName} {lastName} -> {name}")
-                print(Fore.RESET)
-                return Runner(name)
-        if name == "": 
-            return NameResolver.couldntResolve(f"{firstName} {lastName}")
-        print(Fore.YELLOW)
-        print(f"{firstName} {lastName} -> {name}")
-        print(Fore.RESET)
-        return Runner(name)
+        # Goes through files, seeing if any are an exact match 
+        # or match the first 3 characters of the first name and the entire surname
+        names = os.listdir("Members")
+        for i in range(len(names), 0, -1):
+            fileFirstName, fileLastName = names[i][:-4].split()
+            if lastName != fileLastName: 
+                names.remove(i)
+                continue
+            if firstName[:2] != fileFirstName[:2]:
+                names.remove(i)
+            
+        if len(names) == 1:
+            Printer.yellow(f"{name} -> {names[0][:-4]}")
+            return Runner(names[0][:-4])
+        else: 
+            return
     
 
     @staticmethod

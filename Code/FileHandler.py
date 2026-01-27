@@ -22,6 +22,7 @@ class FileHandler:
         return fileLines
 
 
+    @staticmethod
     def writeFileLines(name, lines_to_write):
         """Writes a list of file lines to a runner's file.
         The runner doesn't have to exist.
@@ -55,8 +56,10 @@ class FileHandler:
             elif ageCat in VALID_AGES: 
                 break
             print("\nNot a valid age category.")
-        
-        fileLines = [name, "\n", ageCat, "\n", "TOTAL: 0\n", "------------------------------\n"]
+        if ageCat in ["MU17, WU17"]:
+            fileLines = [name, "\n", ageCat, "\n", "TOTAL: 0\n", "PARKRUNS: 0\n" "------------------------------\n"]
+        else:
+            fileLines = [name, "\n", ageCat, "\n", "TOTAL: 0\n", "------------------------------\n"]
         FileHandler.writeFileLines(name, fileLines)
         print(f"\nFILE CREATED FOR '{name}'.\n")
         return name
@@ -89,6 +92,7 @@ class FileHandler:
         parkrun_file.close()
     
 
+    @staticmethod
     def addToHistory(race:Race):
         """Adds a race to the history.txt file
         """

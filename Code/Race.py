@@ -1,7 +1,8 @@
 
 import json
 import time
-from colorama import Fore
+
+from Code.Printer import Printer
 
 TIME_FORMAT = "%H.%M.%S"
 VALID_AGES = ["MU17", "M17-39", "M40-44", "M45-49", "M50-54", "M55-59", "M60-64", "M65+",
@@ -52,6 +53,7 @@ class Race:
         if date != "": return date
         else: return None
 
+
     def getFullName(self):
         if self.dist.isnumeric():
             return self.name
@@ -65,11 +67,7 @@ class Race:
             toPrint = f"{self.name}, {self.dist} POINTS, {self.date} - {runnersAdded} runners added so far."
         else:
             toPrint = f"{self.name} {self.dist}, {self.date} - {runnersAdded} runners added so far."
-        print(Fore.GREEN)
-        print("-" * len(toPrint))
-        print(toPrint)
-        print("-" * len(toPrint))
-        print(Fore.RESET)
+        Printer.green("-" * len(toPrint) + "\n" + toPrint + "\n" + "-" * len(toPrint))
 
 
     def getTime(self):

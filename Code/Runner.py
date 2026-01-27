@@ -2,11 +2,13 @@
 import json
 import os
 import time
-from colorama import Fore
-
 from Code.FileHandler import FileHandler
+from Code.Printer import Printer
 from Code.Race import Race
+
 TIME_FORMAT = "%H.%M.%S"
+VALID_AGES = ["MU17", "M17-39", "M40-44", "M45-49", "M50-54", "M55-59", "M60-64", "M65+",
+                 "WU17", "W17-34", "W35-39", "W40-44", "W45-49", "W50-54", "W55-59", "W60-64", "W65+"]
 
 class Runner:
 
@@ -15,7 +17,10 @@ class Runner:
             self.fileLines = FileHandler.getFileLines(name)
             self.name = name
             self.ageCat = self.fileLines[1].strip()
+            if self.ageCat[-1] == "?": self.setAgeCat()
             self.points = int(self.fileLines[2][7:].strip())
+            if self.ageCat in ["MU17", "WU17"]:
+                self.parkruns = int(self.fileLines[3][10:].strip())
 
 
     @staticmethod
@@ -33,11 +38,8 @@ class Runner:
         """
         toPrint = f"{self.name}, {self.ageCat}, TOTAL: {self.points}"
         
-        print(Fore.BLUE)
-        print("-" * len(toPrint))
-        print(toPrint)
-        print("-" * len(toPrint))
-        print(Fore.RESET)
+        Printer.blue("-" * len(toPrint) + "\n" + toPrint + "\n" + "-" * len(toPrint))
+
 
 
     def addToFile(self, race:Race, raceTime:time) -> int:
@@ -74,3 +76,17 @@ class Runner:
                 points += 1
         if points == 9: points += 1
         return points
+    
+
+    def setAgeCat(self):
+        print(f"This person was {self.ageCat}.")
+
+        new_age_cat = None
+        while new_age_cat not in VALID_AGES + [""]:
+            new_age_cat = input("New age category (type nothing to keep the same): ")
+            new_age_cat = new_age_cat.upper()
+
+        if new_age_cat == "":
+            self.ageCat = self.ageCat[:-1]
+        else:
+            self.ageCat = new_age_cat

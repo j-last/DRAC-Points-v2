@@ -26,15 +26,7 @@ def getAgeCat(runnerName):
         if ageCat == "MU40": ageCat = "M17-39"
         elif ageCat == "WU35": ageCat = "W17-34"
 
-        print(f"This person was {ageCat}.")
-
-        new_age_cat = None
-        while new_age_cat not in VALID_AGES + [""]:
-            new_age_cat = input("New age category (type nothing to keep the same): ")
-            new_age_cat = new_age_cat.upper()
-
-        if new_age_cat == "":
-            new_age_cat = ageCat
+        
 
         lines[1] = ageCat + "\n"
 
