@@ -13,19 +13,22 @@ VALID_AGES = ["MU17", "M17-39", "M40-44", "M45-49", "M50-54", "M55-59", "M60-64"
 class Runner:
 
     def __init__(self, name:str):
-        if Runner.exists(name):
-            self.fileLines = FileHandler.getFileLines(name)
-            self.name = name
-            self.ageCat = self.fileLines[1].strip()
-            if self.ageCat[-1] == "?": self.setAgeCat()
-            self.points = int(self.fileLines[2][7:].strip())
-            if self.ageCat in ["MU17", "WU17"]:
-                self.parkruns = int(self.fileLines[3][10:].strip())
+        """Converts from file contents -> Runner object
+        If the age category is not set, this is resolved here.
+        """
+        self.fileLines = FileHandler.getFileLines(name)
+        self.name = name
+        self.ageCat = self.fileLines[1].strip()
+        self.points = int(self.fileLines[2][7:].strip())
+
+        if self.ageCat[-1] == "?": self.setAgeCat()
+        if self.ageCat in ["MU17", "WU17"]:
+            self.parkruns = int(self.fileLines[3][10:].strip())
 
 
     @staticmethod
-    def exists(name):
-        """Returns True if the runner name exists, otherwise False.
+    def exists(name:str) -> bool:
+        """Returns True if the runner has a file, otherwise False.
         """
         people = os.listdir("Members")
         if name + ".txt" in people:
@@ -33,7 +36,7 @@ class Runner:
         else: return False
 
 
-    def printDetails(self):
+    def printDetails(self) -> None:
         """Prints the race details with horizontal lines above and below it.
         """
         toPrint = f"{self.name}, {self.ageCat}, TOTAL: {self.points}"
@@ -50,17 +53,21 @@ class Runner:
         self.points += points
 
         self.fileLines[2] = "TOTAL: " + str(self.points) + "\n"
-        
+            
         if raceTime is not None:
-            self.fileLines.append(f"{race.getFullName()}, {time.strftime(TIME_FORMAT, raceTime)}, {race.date}, {points} POINTS\n")
+            self.fileLines.append(f"{race.getFullName()}, {time.strftime(TIME_FORMAT, raceTime)}, {race.date}, {points} POINT(S)\n")
         else:
-            self.fileLines.append(f"{race.getFullName()}, {points} POINTS\n")
+            self.fileLines.append(f"{race.getFullName()}, {points} POINT(S)\n")
 
         FileHandler.writeFileLines(self.name, self.fileLines)
-        print(f"ADDED {points} POINTS to {self.name} (TOTAL: {self.points})")
+        Printer.blue(f"ADDED {points} POINTS to {self.name} (TOTAL: {self.points})", "\n")
     
 
-    def calcPoints(self, race, raceTime):
+    def calcPoints(self, race:Race, raceTime:time) -> int:
+        """Calculates the number of points for a race.
+        If the race distance is numeric, then it returns this, so raceTime can be None.
+        Otherwise, raceTime cannot be None as this is needed to calculate points.
+        """
         if race.dist.isnumeric():
             return int(race.dist)
 
@@ -78,7 +85,10 @@ class Runner:
         return points
     
 
-    def setAgeCat(self):
+    def setAgeCat(self) -> None:
+        """Prompts the user to update the persons age category.
+        """
+        self.printDetails()
         print(f"This person was {self.ageCat}.")
 
         new_age_cat = None
@@ -90,3 +100,4 @@ class Runner:
             self.ageCat = self.ageCat[:-1]
         else:
             self.ageCat = new_age_cat
+        self.fileLines[1] = self.ageCat + "\n"

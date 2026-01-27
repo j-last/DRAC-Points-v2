@@ -3,6 +3,7 @@
 import datetime
 import os
 
+from Code.Printer import Printer
 from Code.Race import Race
 
 VALID_AGES = ["MU17", "M17-39", "M40-44", "M45-49", "M50-54", "M55-59", "M60-64", "M65+",
@@ -15,7 +16,6 @@ class FileHandler:
         """Gets the file lines of a runner's file in a list format.
         The runner must exist.
         """
-
         personFile = open(os.path.join("Members", name + ".txt"), "r")
         fileLines = personFile.readlines()
         personFile.close()
@@ -31,32 +31,33 @@ class FileHandler:
         personFile.writelines(lines_to_write)
         personFile.close()
 
+
     @staticmethod
     def createFile():
         """Prompts the user to create a new runner file.
-        File in the form FIRSTNAME LASTNAME.txt will be created.
+        File in the form 'FIRSTNAME LASTNAME.txt' will be created containing the default file lines.
         """
         while True:
             name = input("Create file for name: ").strip().upper()
             if name == "":
-                print("\nNo new file created.")
+                Printer.red("\nNo new file created.")
                 return
             if name + ".txt" in os.listdir("Members"):
-                print("A file already exists for that name. No new file created.")
+                Printer.red("A file already exists for that name. No new file created.")
                 return
             elif len(name.split()) == 2: 
                 break
-            print("\nPlease write in the form <firstname> <lastname>.")
+            Printer.red("\nPlease write in the form <firstname> <lastname>.")
 
         while True:
             ageCat = input(f"Age category for {name}: ").upper()
             if ageCat == "": 
-                print("\nNo new file created.")
+                Printer.red("\nNo new file created.")
                 return
             elif ageCat in VALID_AGES: 
                 break
-            print("\nNot a valid age category.")
-        if ageCat in ["MU17, WU17"]:
+            Printer.red("\nNot a valid age category.")
+        if ageCat in ["MU17", "WU17"]:
             fileLines = [name, "\n", ageCat, "\n", "TOTAL: 0\n", "PARKRUNS: 0\n" "------------------------------\n"]
         else:
             fileLines = [name, "\n", ageCat, "\n", "TOTAL: 0\n", "------------------------------\n"]
@@ -67,6 +68,8 @@ class FileHandler:
 
     @staticmethod
     def getParkrunDict():
+        """Opens parkruns.txt and converts the data to a dictionary format {name : total}
+        """
         parkrun_file = open("Parkruns/parkruns.txt", "r")
         lines = parkrun_file.readlines()
         parkrun_file.close()
@@ -81,6 +84,8 @@ class FileHandler:
 
     @staticmethod
     def writeParkruns(parkrun_dict):
+        """Writes a parkrun dictionary in the form {name : total} to parkruns.txt
+        """
         sorted_parkruns = []
         for name, number in parkrun_dict.items():
             sorted_parkruns.append((number, name))

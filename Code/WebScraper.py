@@ -6,7 +6,10 @@ from bs4 import BeautifulSoup as bs
 
 class WebScraper:
 
-    def getTotalRaceTimingResults(url):
+    def getTotalRaceTimingResults(url:str) -> dict[str:time]:
+        """Web scrapes all dereham runners AC results from a totalracetiming website.
+        Returns a dictionary with entries in the form {runnerName : runnerTime}
+        """
         race_runners = {}
 
         page = requests.get(url)
@@ -25,7 +28,9 @@ class WebScraper:
         return race_runners
     
 
-    def getParkrunners(web_text):
+    def getParkrunners(web_text:str) -> list[str]:
+        """Searches through the text to find all Dereham Runenrs who did parkrun,
+        and returns a list of these names."""
         endindex = web_text.find("Dereham Runners AC")
         runners = []
 

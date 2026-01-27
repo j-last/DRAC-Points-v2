@@ -11,6 +11,9 @@ VALID_AGES = ["MU17", "M17-39", "M40-44", "M45-49", "M50-54", "M55-59", "M60-64"
 class Race:
 
     def __init__(self, name=None, dist=None):
+        """Instantiates a Race object by asking the user for it's name, distance and date (if not provided in the args)
+        Raises a ValueError if the user enters nothing for any of these.
+        """
         if name is not None: self.name = name
         else: self.name = self.inputRaceName()
         if self.name is None: raise ValueError("No race name provided.")
@@ -42,7 +45,7 @@ class Race:
             if dist == "": return None
             elif dist in validDistances: return dist # race dist is a valid distance
             elif dist.isnumeric(): return dist # race dist is a valid points value
-            else: print("\nThis is not a valid distance or points value.\n")
+            else: Printer.yellow("\nThis is not a valid distance or points value.\n")
 
     
     def inputRaceDate(self) -> str:
@@ -54,13 +57,15 @@ class Race:
         else: return None
 
 
-    def getFullName(self):
+    def getFullName(self) -> str:
+        """Returns the name and distance of the race as a string.
+        E.g. name='Wroxham', dist='5k' returns 'Wroxham 5k'"""
         if self.dist.isnumeric():
             return self.name
         return self.name + " " + self.dist
 
 
-    def printDetails(self, runnersAdded:int):
+    def printDetails(self, runnersAdded:int) -> None:
         """Prints the race details with horizontal lines above and below it.
         """
         if self.dist.isnumeric():
@@ -70,7 +75,10 @@ class Race:
         Printer.green("-" * len(toPrint) + "\n" + toPrint + "\n" + "-" * len(toPrint))
 
 
-    def getTime(self):
+    def getTime(self) -> time:
+        """Gets the user to enter a time for a race.
+        Instantly returns None if the race distance is numeric (as this doesn't require a time)
+        """
         if self.dist.isnumeric():
             return
         while True:
@@ -83,7 +91,7 @@ class Race:
                 raceTime = time.strptime(raceTime, TIME_FORMAT)
                 return raceTime
             except ValueError:
-                print(f"Invalid time format '{raceTime}'. Please try again.")
+                Printer.red(f"Invalid time format '{raceTime}'. Please try again.")
 
 
  

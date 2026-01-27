@@ -13,8 +13,10 @@ TIME_FORMAT = "%H.%M.%S"
 
 # main code
 def mainloop():
+    """The main menu loop, asking the user to select a function from a list of possibilities.
+    """
     while True:
-        print("""------------------------------------------------------
+        Printer.white("""------------------------------------------------------
 T: TotalRaceTiming Link
 P: Parkrun Website
               
@@ -30,10 +32,13 @@ E: Backup & Exit
         elif action == "R": manualRaceEntry()
         elif action == "L": listOfNames()
         elif action == "E": backup(); break
-        else: print("Not a valid option. Please try again.")
+        else: Printer.red("Not a valid option. Please try again.")
 
 
 def urlRaceEntry():
+    """Allows the user to enter a TotalRaceTiming link. All names are then resolved to a file name,
+    displaying all results to the user, asking them to confirm before the results are added.
+    """
     # Race details
     try: race :Race = Race()
     except ValueError: return
@@ -49,7 +54,7 @@ def urlRaceEntry():
         Printer.red("Something went wrong.")
         return
 
-    # Resolve all names, creating a list of (name that exists, their time)
+    # Resolve all names, creating a list of tuples in the form: (name that exists, their time)
     # Anyone not resolved added to a seperate list
     toAdd, notAdded = [], []
     for runnerName, raceTime in runnersAndTimes.items():
@@ -61,9 +66,10 @@ def urlRaceEntry():
             notAdded.append((runnerName, raceTime))
     
     # Display all results that will be added before they're added
+    Printer.green("RESULTS:", "\n")
     for runner, raceTime in toAdd:
-        Printer.blue(f"{runner.name} - {time.strftime(TIME_FORMAT, raceTime)}")
-    answer = input("ADD THESE RESULTS? (y/n) ")
+        Printer.blue(f"{runner.name} - {time.strftime(TIME_FORMAT, raceTime)}", "\n")
+    answer = input(f"ADD THESE RESULTS? ({len(toAdd)} runners) (y/n) ")
     if answer.lower() == "y":
         # add the results
         for runner, raceTime in toAdd:
@@ -73,19 +79,22 @@ def urlRaceEntry():
         Printer.red("No results added")
         return
     
-    print(f"{runnersAdded} RUNNERS ADDED")
+    Printer.green(f"{runnersAdded} RUNNERS ADDED")
 
     # Display all not added results before exiting to main menu
     if len(notAdded) > 0:
-        Printer.red("NOT ADDED: ")
+        Printer.red("NOT ADDED: ", "\n")
         for runnerName, raceTime in notAdded:
-            Printer.red(f"{runnerName} - {time.strftime(TIME_FORMAT, raceTime)}")
+            Printer.red(f"{runnerName} - {time.strftime(TIME_FORMAT, raceTime)}", "\n")
 
     FileHandler.addToHistory(race)
     
 
 def addParkrunsAuto():
-    try: race :Race = Race("parkrun", 1)
+    """Allows the user to copy+paste a consolidated report from the parkrun website,
+    summing up total parkruns in 'Parkruns/parkruns.txt' and adding points to juniors where applicable.
+    """
+    try: race :Race = Race("parkrun", "1")
     except ValueError: return
 
     with open("Parkruns/don't add to parkrun list.txt") as f:
@@ -108,26 +117,32 @@ def addParkrunsAuto():
         else:
             newlines[name] = 1
         runners_added += 1
-        print(f"{name.upper()} has now done {newlines[name]} parkruns.")
+        Printer.white(f"{name.upper()} has now done {newlines[name]} parkruns.", end="\n")
 
         runner = NameResolver.getRunnerFromName(name)
         if runner is not None:
             if runner.ageCat in ["MU17", "WU17"]:
+                runner.parkruns += 1
+                runner.fileLines[3] = runner.fileLines[3] = "PARKRUNS: " + str(runner.parkruns) + "\n"
+                FileHandler.writeFileLines(runner.name, runner.fileLines)
                 if runner.parkruns < 10:
                     runner.addToFile(race, None)
                     continue
-                print(f"{runner.name} has done more than 10 parkruns, no points added.")
-            print(f"{runner.name} is not a junior, no points added.")
+                Printer.cyan(f"{runner.name} has done more than 10 parkruns, no points added.")
+                continue
+            Printer.cyan(f"{runner.name} is not a junior, no points added.")
                 
 
     FileHandler.writeParkruns(newlines)
 
-    print(f"{runners_added} runners have been added.")
+    Printer.green(f"{runners_added} RUNNERS ADDED")
 
     FileHandler.addToHistory(race)
 
 
 def manualRaceEntry():
+    """Continually asks the user for a name (and a time if applicable) and adds this result to their file.
+    """
     try: race :Race = Race()
     except ValueError: return
 
@@ -142,11 +157,14 @@ def manualRaceEntry():
 
         runnersAdded += 1
         
-    print(f"\n{runnersAdded} RUNNERS ADDED")
+    Printer.green(f"{runnersAdded} RUNNERS ADDED")
     FileHandler.addToHistory(race)
 
 
 def listOfNames():
+    """Allows the user to enter a list of names, which are then resolved to files before listing
+    all names, asking the user to confirm all names have been resolved correctly before they are added.
+    """
     try: race :Race = Race()
     except ValueError: return
     if not race.dist.isnumeric():
@@ -157,6 +175,7 @@ def listOfNames():
 
     try:
         nameList = stringList.split(",")
+        nameList[1]
     except:
         Printer.red("List is in an invalid format.")
         return
@@ -171,20 +190,23 @@ def listOfNames():
             totalRunners += 1
 
     runnersAdded = 0
-    if input(f"Add {race.dist} to these people ({totalRunners} runners)? (y/n) ").lower() == "y":
+    if input(f"Add {race.dist} point(s) to these people ({totalRunners} runners)? (y/n) ").lower() == "y":
         for runner in nameList:
-            runner.addToFile(race, None)
+            if runner is not None:
+                runner.addToFile(race, None)
 
-    print(f"{runnersAdded} runners added.")
+    Printer.green(f"{runnersAdded} runners added.")
 
     FileHandler.addToHistory(race)
 
 
 def summarySheet():
+    """Creates a summary sheet (a sheet of names in order of points) in Summary Sheet.txt
+    """
     points_list = []
     
     for name in os.listdir("Members"):
-        print(name[:-4])
+        Printer.blue(name[:-4], end="\n")
         f = open(os.path.join("Members", name), "r")
         fileLines = f.readlines()
         points = int(fileLines[2].strip()[6:])
@@ -204,6 +226,8 @@ def summarySheet():
 
 
 def backup():
+    """Copies all files to a backups folder, including all members files, parkruns.txt and Summary Sheet.txt
+    """
     dateForFile = str(datetime.date.strftime(datetime.date.today(), "%d-%m-%Y"))
 
     if not os.path.exists(os.path.join("Backups", dateForFile)):
@@ -222,6 +246,6 @@ def backup():
     open(os.path.join("Backups", dateForFile, "2 Summary Sheet.txt"), "w").close()
     shutil.copy("Summary Sheet.txt", os.path.join("Backups", dateForFile, "2 Summary Sheet.txt"))
       
-    print(f"Backup made for {dateForFile}")
+    Printer.green(f"Backup made for {dateForFile}")
 
 mainloop()
