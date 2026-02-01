@@ -99,7 +99,7 @@ def addParkrunsAuto():
     Printer.red("If it starts asking you to create files, you can just ignore this (enter nothing) unless they are a junior.\n Alternatively, you can create a file for them to stop it asking again next time.")
     with open("Parkruns/don't add to parkrun list.txt") as f:
         dontAdd = f.readlines()
-        dontAdd = list(map(str.strip, dontAdd))
+        dontAdd = list(map(str.upper, map(str.strip, dontAdd)))
 
     web_text = input("CTRL+A then CTRL+C on the consolodated report website and CTRL+V here: ")
     runners = WebScraper.getParkrunners(web_text)
