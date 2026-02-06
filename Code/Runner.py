@@ -57,7 +57,7 @@ class Runner:
         if raceTime is not None:
             self.fileLines.append(f"{race.getFullName()}, {time.strftime(TIME_FORMAT, raceTime)}, {race.date}, {points} POINT(S)\n")
         else:
-            self.fileLines.append(f"{race.getFullName()}, {points} POINT(S)\n")
+            self.fileLines.append(f"{race.getFullName()}, {race.date}, {points} POINT(S)\n")
 
         FileHandler.writeFileLines(self.name, self.fileLines)
         Printer.blue(f"ADDED {points} POINTS to {self.name} (TOTAL: {self.points})", "\n")
